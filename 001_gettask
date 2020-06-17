@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+rsync -azzvhi "r:/Volumes/L/bea_res/Autism/Experiments\ \&\ Data/K\ Award/Scanner/Raw\ Data/" ../task

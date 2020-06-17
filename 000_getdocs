@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+for f in \
+  '/Volumes/L/bea_res/Personal/Jen/Autism/fMRI\ Analysis/AutScanData_Demos.xlsx'\
+  '/Volumes/B/bea_res/Autism/Subject\ Info/Database*' \
+  '/Volumes/B/bea_res/Autism/Subject\ Info/AutSubDemos_20180501.csv'\
+  "/Volumes/B/bea_res/Autism/*xlsx" \
+  "/Volumes/TX/Autism_Faces/AutFaceY1_stims/txt/demog.txt"\
+  "/Volumes/L/bea_res/Autism/subj_exp_dicom.csv" \
+; do
+   rsync -avhi --size-only ry:"$f" txt/; 
+done
