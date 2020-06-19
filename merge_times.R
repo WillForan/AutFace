@@ -8,7 +8,7 @@ mr <- read.table('txt/times_mr.txt')  %>%
     `names<-`(c('mrid','seqnum','dim4','task','time','age','sex')) %>%
     mutate(dt=ymd_hms(paste0("20",substr(mrid,0,6)," ", time))) %>%
     group_by(mrid) %>%
-    filter(grepl('ep2d_bold_face',task), dim4 %in% c(188,228)) %>%
+    filter(grepl('ep2d_bold_face',task), dim4 %in% c(188, 226, 228)) %>%
     mutate(rank=rank(seqnum), start=min(dt))
 
 tk <- read.table('txt/times_task.txt') %>%

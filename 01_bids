@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ls -d ../raw/1*|
+ls -d ../raw/12*|sed 1q|
    xargs -n 1 -P2 \
-     heudiconv -o ../BIDS/ -c none -f ./bids.py --files 
+     heudiconv -o ../BIDS/ -c dcm2niix -f ./bids.py --dcmconfig ./dcm2niixcfg.json --files 
 
