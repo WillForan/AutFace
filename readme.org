@@ -1,0 +1,79 @@
+#+TITLE: Autism Faces
+
+* Tasks
+  
+** Behave
+   * 3 image tasks each with 2 conditions.
+   * USA faces, AUS faces, and cars
+#+BEGIN_SRC bash :exports results :cache yes
+for f in ../task/Year*1/102/*txt; do
+  basename "$f" .txt | tr "\n" "\t"
+  iconv -f utf16 -t utf8 "$f" |perl -lne 'print $2 if m/Session(D|T).*: (.*)/'|sed 2q|paste - -
+done | sort -k3,3n  -t$'\t'
+#+END_SRC
+
+#+NAME: behave
+#+RESULTS[81071a342679fea8ebdd0051c4f0afb59cc59d69]:
+| AUS_CMFT-102-1       | 10-01-2011 | 12:23:14 |
+| AUS_CMFT_Cond2-102-1 | 10-01-2011 | 12:28:56 |
+| Cars-102-1           | 10-01-2011 | 12:49:41 |
+| Cars_Cond2-102-1     | 10-01-2011 | 12:55:19 |
+| CMFT-102-1           | 10-01-2011 | 12:36:12 |
+| CMFT_Cond2-102-1     | 10-01-2011 | 12:42:03 |
+
+** MR
+   * ~188~ TRs of condtion 1 and ~228~ of condition 2
+   * ~200~ TRs of rest
+#+BEGIN_SRC bash :exports results :cache yes
+for d in ../raw/11100111*/*; do
+  A=($(find $d -type f,l -iname '*dcm' ));
+  echo $(basename $d) ${#A[@]} $(dicom_hinfo -no_name -tag 0018,1030 -tag 0008,0033 ${A[0]}|
+        perl -slane '$F[1]=~s/(\d{2})(\d{2})([0-9.]+)/\1:\2:\3/; print "@F"');
+done | grep ep2d_bold
+#+END_SRC
+
+#+NAME: MR
+#+RESULTS[0adb258d5bbe409a2a6dea919af94165be9273c6]:
+|  5 | 188 | ep2d_bold_face | 12:09:42.218000 |
+|  6 | 228 | ep2d_bold_face | 12:15:22.562000 |
+|  7 | 188 | ep2d_bold_face | 12:22:42.015000 |
+|  8 | 228 | ep2d_bold_face | 12:29:14.421000 |
+|  9 | 188 | ep2d_bold_face | 12:36:04.828000 |
+| 10 | 228 | ep2d_bold_face | 12:41:49.375000 |
+| 13 | 200 | ep2d_bold_rest | 13:02:32.781000 |
+
+** Together
+  * MR clock is set earlier than the task presentation (EPrime) computer by approx ~13 min~ in 2011-10
+  * Task can start (and be waiting for the scanner trigger) before MR scan starts
+
+#+BEGIN_SRC R :var mr=MR  behave=behave :exports both :cache yes :colnames yes :session 
+  library(dplyr)
+  t2s <- function(x) as.numeric(lubridate::hms(x))
+  tdif <- function(x) c(0,diff(x))/60
+  showd <- function(x) t2s(x) %>% tdif %>% cumsum %>% round(2)
+  names(mr) <- c("seq","dim4","name","mr_time")
+  names(behave) <-c("task","date","b_time")
+  mr %>%
+    mutate(mr_diff=showd(mr_time)) %>%
+    filter(grepl('face',name)) %>% 
+    cbind(
+      behave %>%
+      arrange(b_time) %>%
+      mutate(t_diff=showd(b_time))
+    ) %>%
+    mutate(mVt = round((t2s(b_time)-t2s(mr_time))/60,2)) %>%
+    select(seq,dim4,name,task, mr_diff, t_diff, mVt, mr_time, b_time)
+#+END_SRC
+
+#+RESULTS[58e4036b64d5027264e15700993dd32c5939c4b1]:
+| seq | dim4 | name           | task                 | mr_diff | t_diff |   mVt |         mr_time |   b_time |
+|-----+------+----------------+----------------------+---------+--------+-------+-----------------+----------|
+|   6 |  228 | ep2d_bold_face | AUS_CMFT_Cond2-102-1 |       0 |      0 | 13.56 | 12:15:22.562000 | 12:28:56 |
+|   7 |  188 | ep2d_bold_face | CMFT-102-1           |    7.32 |   7.27 |  13.5 | 12:22:42.015000 | 12:36:12 |
+|   8 |  228 | ep2d_bold_face | CMFT_Cond2-102-1     |   13.86 |  13.12 | 12.81 | 12:29:14.421000 | 12:42:03 |
+|   9 |  188 | ep2d_bold_face | Cars-102-1           |    20.7 |  20.75 |  13.6 | 12:36:04.828000 | 12:49:41 |
+|  10 |  228 | ep2d_bold_face | Cars_Cond2-102-1     |   26.45 |  26.38 | 13.49 | 12:41:49.375000 | 12:55:19 |
+
+** Eye tracking
+
+exists. not used currently.

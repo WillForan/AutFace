@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+cd $(dirname $0)
+for f in ../task/Year*/*/*txt; do
+  perl -ne 'm:Year (\d)/(\d+)/([^-]+):; print "$2\t$1\t$3\t"' <<< $f
+  iconv -f utf16 -t utf8 "$f" |perl -lne 'print $2 if m/Session(D|T).*: (.*)/'|sed 's///g;2q'|paste - -
+done | sort -t$'\t' -k1,2 -k5  |tee txt/times_task.txt

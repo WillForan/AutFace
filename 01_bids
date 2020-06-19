@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 ls -d ../raw/1*|
-   sed s:.*/::|
-   sed 3q|
-   xargs -P2 \
-     heudiconv -d '../raw/{subject}/*/*' -o ../BIDS/ -c none -f ./bids.py -s 
+   xargs -n 1 -P2 \
+     heudiconv -o ../BIDS/ -c none -f ./bids.py --files 
 
