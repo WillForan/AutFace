@@ -1,6 +1,42 @@
 #!/usr/bin/env bash
+set -eou pipefail
+cd $(dirname $0)
+env|grep -q ^DRYRUN=. && DRYRUN=echo || DRYRUN=
 
-ls -d ../raw/12*|sed 1q|
-   xargs -n 1 -P2 \
-     heudiconv -o ../BIDS/ -c dcm2niix -f ./bids.py --dcmconfig ./dcm2niixcfg.json --files 
+#ls -d ../raw/12*|sed 1q|
+#   xargs -n 1 -P2 \
+#     heudiconv -o ../BIDS/ -c dcm2niix -f ./bids.py --dcmconfig ./dcm2niixcfg.json --files 
+BIDS=$(cd ../BIDS;pwd)
+
+# id year rank mrid seqnum task tname
+# 102 1 1 111001112750 5 AUS_CMFT AUS
+sed 1d txt/mr_task.txt| while read id year rank mrid seqnum task tname; do
+  dir=$BIDS/sub-$id/ses-$year/func/
+  [ ! -d $dir ] && mkdir -p $dir
+
+  nii=sub-${id}_ses-${year}_task-${tname}_run-1_bold  
+  test -r $dir/$nii.nii.gz ||
+    $DRYRUN niinote $_ dcm2niix -b y -z y -o $dir -f $nii ../raw/$mrid/$(printf %03d $seqnum) 
+done
+
+# 110308160921 004 224 t1_mprage_sag_ns_tilt 16:26:17.750000 044Y F
+egrep 'rest|t1_mprage' txt/times_mr.txt | while read mrid seqnum dim4 name time age sex; do
+    [ -n $DRYRUN ] && echo "# $mrid $seqnum $name"
+    # rest or mprage
+    _dim4=200 && suffix=task-rest_bold && sdir=func 
+    [[ $name =~ mprage ]] && _dim4=176 && suffix=T1w && sdir=anat
+
+
+    [ $dim4 -ne $_dim4 ] && echo "# $mrid $seqnum bad $suffix ($dim4!=$_dim4)" && continue
+    # mrid id year start_diff start_mr start_tk
+    read id year <<< $(grep "^$mrid" txt/mrid_id.txt |cut -f2,3 -d' ') || continue
+    [ -z "$year" ] && echo "# $mrid no year " && continue
+
+    dir=$BIDS/sub-$id/ses-$year/$sdir/
+    [ ! -d $dir ] && mkdir -p $dir
+
+    nii=sub-${id}_ses-${year}_$suffix
+    test -r $dir/$nii.nii.gz ||
+	$DRYRUN niinote $_ dcm2niix -b y -z y -o $dir -f $nii ../raw/$mrid/$seqnum
+done
 

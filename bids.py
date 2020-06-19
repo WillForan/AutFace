@@ -16,7 +16,7 @@ def infotoids(seqsinfo, outdir):
     """lookup subject using patname and info sheet"""
     allids = [x.patient_id for x in seqsinfo]
     # TODO: check all patient_ids are the same
-    s = allids[1]
+    s = allids[0]
 
     return({'subject': "sub-" + IDLOOKUP.get(s, 'UNKNOWN'),
             'locator': None, 'session': None})

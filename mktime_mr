@@ -4,4 +4,4 @@ for d in ../raw/*/*; do
   A=($(find $d -type f,l -iname '*dcm' ));
   echo $(basename $(dirname $d)) $(basename $d) ${#A[@]} $(dicom_hinfo -no_name -tag 0018,1030 -tag 0008,0033 -tag 0010,1010 -tag 0010,0040 ${A[0]}|
         perl -slane '$F[1]=~s/(\d{2})(\d{2})([0-9.]+)/\1:\2:\3/; print "@F"');
-done | grep ep2d_bold | tee txt/times_mr.txt
+done | tee txt/times_mr.txt

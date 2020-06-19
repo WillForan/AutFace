@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: all always
 all: txt/mr_task.txt
 
 txt/times_mr.txt:
