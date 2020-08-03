@@ -16,18 +16,18 @@
 my @f = qx"find ../task/Year* -iname '*.txt'".lines;
 my @all = ();
 for @f -> $f {
-    next unless $f ~~ rx{"Year " $<year> = (\d) "/" $<id> = (\d+) "/" $<task> = (.*) "-" \d**3};
+    next unless $f ~~ rx{Year " " $<year>=(\d) \/ $<id>=(\d+) \/ $<task>=(.*) \- \d**3};
     my %finfo = %$/;
     # merge SessionDate and SessionTime. assume that is always the order. only care about first 2 lines
     # extract datetime time from that
     my $dt = qqx{iconv -f utf16 -t utf8 "$f"|egrep "Session(Date|Time): "|sed 's/.*: //;2q'}.lines.join(" ");
-    $dt ~~ rx{$<m>=(\d+) "-" $<d>=(\d+) "-" $<YC>=(\d**2) $<YY>=(\d**2) " " $<H>=(\d+)":" $<M>=(\d+) ":" $<s>=(\d+)};
+    $dt ~~ rx{$<m>=(\d+) \- $<d>=(\d+) \- $<YC>=(\d**2) $<YY>=(\d**2) " " $<H>=(\d+) \: $<M>=(\d+) \: $<s>=(\d+)};
     # N.B. folders drop century. 2011 is 11. We'll do that here too
     my %all = %$/, %finfo, { 'dt' => "$<YC>$<YY>-$<m>-$<d> $<H>:$<M>",
 			     'day' => "$<YY>$<m>$<d>",
 			     'time' => "$<H>$<M>",
 			     'file'=> $f.subst(/.* '/'/,"") };
-    @all.push(%all<id year dt day time task file>);
+    @all.push(%all<id year dt day time task file>:p.hash);
 }
 
 # doesn't work in repl?

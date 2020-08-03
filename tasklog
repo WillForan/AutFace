@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# 20200802 - extract preformance and timing information from eprime log files
+# * early tasks do not have "Onset" columns
+# * eptxt is part of lncdtools
+set -euo pipefail
+
+CMFT=CorrectResp1,CorrectResp2,CorrectResp3,FaceCenter,FaceLeft,FaceRight,Fixation1,Fixation2,Fixation3,Fixation4,TestCenter,TestLeft,TestRight,TrialList,TestCenter.ACC,TestLeft.ACC,TestRight.ACC,TestCenter.CRESP,TestLeft.CRESP,TestRight.CRESP,TrialList.Cycle,Fixation1.OffsetTime,Fixation2.OffsetTime,Fixation3.OffsetTime,Fixation4.OffsetTime,MemorizeCenter.OffsetTime,MemorizeLeft.OffsetTime,MemorizeRight.OffsetTime,TestCenter.OffsetTime,TestLeft.OffsetTime,TestRight.OffsetTime,Fixation1.OnsetTime,Fixation2.OnsetTime,Fixation3.OnsetTime,Fixation4.OnsetTime,MemorizeCenter.OnsetTime,MemorizeLeft.OnsetTime,MemorizeRight.OnsetTime,TestCenter.OnsetTime,TestLeft.OnsetTime,TestRight.OnsetTime,TestCenter.RESP,TestRight.RESP,TestCenter.RT,TestLeft.RT,TestRight.RT
+Cars=CorrectResp1,CorrectResp2,CorrectResp3,BackImage,FrontImage,SideImage,Fixation1,Fixation2,Fixation3,Fixation4,TestBack,TestFront,TestSide,TrialList,TestBack.ACC,TestFront.ACC,TestSide.ACC,TestFront.CRESP,TestSide.CRESP,TrialList.Cycle,Fixation2.Duration,Fixation1.OffsetTime,Fixation2.OffsetTime,Fixation3.OffsetTime,Fixation4.OffsetTime,MemorizeBack.OffsetTime,MemorizeFront.OffsetTime,MemorizeSide.OffsetTime,TestBack.OffsetTime,TestFront.OffsetTime,TestSide.OffsetTime,Fixation1.OnsetTime,Fixation2.OnsetTime,Fixation3.OnsetTime,Fixation4.OnsetTime,MemorizeBack.OnsetTime,MemorizeFront.OnsetTime,MemorizeSide.OnsetTime,TestBack.OnsetTime,TestFront.OnsetTime,TestSide.OnsetTime,TestFront.RESP,TestSide.RESP,TestBack.RT,TestFront.RT,TestSide.RT
+#Cars=$(echo $CMFT|perl -pe '
+# s/FaceLeft/FrontImage/g;s/FaceCenter/SideImage/g;s/FaceRight/BackImage/g;
+# ')
+
+for task in AUS_CMFT CMFT Cars; do
+   [[ $task =~ CMFT ]] && keys=$CMFT || keys=$Cars
+   eptxt -p '\d{3}' -k "file,id,SessionDate,TrialList,$keys" ../task/*/*/$task-[12][0-9][0-9]-[1-9].txt |
+      perl -F"\t" -slane 'next if $F[3] eq "NA"; $F[0]=~s/.*Year //;print join"\t", @F' > txt/eprime_$task.tsv
+done
