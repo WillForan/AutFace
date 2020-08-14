@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# run preprocessing using fmri_preprocessing_scripts
+# 20200625 - init, test with 102/ses-1
+#  docker's afni is too old!
+#   --docker preproc:fmriprep 
+# 20200706 - current docker has issue with "rel" ?
+# --docker lncd/preproc:min
+# using pyenv to get local python working
+
+njobs() { jobs -p|wc -l;}
+updatejobs(){ source $(cd $(dirname $0);pwd)/.jobcfg; } # MAXJOBS SLEEPTIME
+waitforjobs(){
+  cnt=0
+  updatejobs
+  while [ $(njobs) -gt $MAXJOBS ]; do
+     let ++cnt
+     echo "# WAITING #$cnt @ $(date +%F/%H:%M) -- ${MAXJOBS} jobs, ${SLEEPTIME}s"
+     sleep $SLEEPTIME
+     updatejobs
+  done  
+}
+
+# TODO: for task in AUS Car and USA
+for task in AUS Cars USA CarsTest USATest; do
+ls -d /data/Autism_Faces/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses; do
+  #echo $id_ses $(date) | tee runlog_aus.log
+  # /data/Autism_Faces/preproc/aus/103/ses-1/sub-103_ses-1_task-AUS_run-1_bold/.preproc
+  test -r /data/Autism_Faces/preproc/*/$id_ses/sub-${id_ses/\//_}*task-${task}_*/.preprocessfunctional_incomplete &&
+     echo "# have $_" &&
+     continue
+  test -r /data/Autism_Faces/preproc/*/$id_ses/sub-${id_ses/\//_}*task-${task}_*/.preprocessfunctional_complete && echo "# have $_" && continue
+  lncdprep /data/Autism_Faces/BIDS/ /data/Autism_Faces/preproc $id_ses --t2dir ${task,,} --pattern "*$task*nii.gz" -- -smoothing_kernel 6 -motion_censor fd=0.8,dvars=20 &
+  waitforjobs
+done
+done
+
+wait
