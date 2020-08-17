@@ -10,9 +10,19 @@ Cars=CorrectResp1,CorrectResp2,CorrectResp3,BackImage,FrontImage,SideImage,Fixat
 #Cars=$(echo $CMFT|perl -pe '
 # s/FaceLeft/FrontImage/g;s/FaceCenter/SideImage/g;s/FaceRight/BackImage/g;
 # ')
+TESTKEYS=file,id,SessionDate,SessionTime,FixationTime,Fixation.OnsetTime,CorrectResp,TestSlide,TestSlide.OnsetTime,TestSlide.RESP,TestSlide.CRESP,TestSlide.RT,TestSlide.ACC 
 
+removeEmtpy_TrucFname() { perl -F"\t" -slane 'next if $F[4] eq "NA"; $F[0]=~s/.*Year //;print join"\t", @F'; }
 for task in AUS_CMFT CMFT Cars; do
    [[ $task =~ CMFT ]] && keys=$CMFT || keys=$Cars
-   eptxt -p '\d{3}' -k "file,id,SessionDate,TrialList,$keys" ../task/*/*/$task-[12][0-9][0-9]-[1-9].txt |
-      perl -F"\t" -slane 'next if $F[3] eq "NA"; $F[0]=~s/.*Year //;print join"\t", @F' > txt/eprime_$task.tsv
+   tfiles=(../task/*/*/$task-[12][0-9][0-9]-[1-9].txt)
+   echo "# $task ${#tfiles}"
+   eptxt -p '\d{3}' -k "file,id,SessionDate,SessionTime,TrialList,$keys" "${tfiles[@]}" |
+      removeEmtpy_TrucFname > txt/eprime/$task.tsv
+
+   tfiles=(../task/*/*/${task}_Cond2-[12][0-9][0-9]-[1-9].txt)
+   echo "# $task 'Cond2' ${#tfiles}"
+   eptxt -p '\d{3}' -k $TESTKEYS "${tfiles[@]}"|
+      removeEmtpy_TrucFname > txt/eprime/test_$task.tsv
 done
+

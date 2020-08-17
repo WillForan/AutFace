@@ -34,6 +34,18 @@ library(tidyr)
 #    1 102 AUS_CMFT 2011-10-01 12:23:14      1 TestL   1  4500 1729  31.5
 
 
+## finally timing
+# 
+# > onsets_forced %>% filter(event=="TestR", repnum==6) %>% group_by(year,task,onset) %>% tally %>% showdf
+# year     task onset   n
+#    1 AUS_CMFT 262.5  99
+#    1     Cars 259.5 101
+#    1     CMFT 258.0  99
+#    2 AUS_CMFT 262.5  30
+#    2     Cars 259.5  30
+#    2     CMFT 258.0  30
+
+
 # make Front=>Left, Side=>Center, and Back=>Right for Cars
 # and then truncate all the names
 # rename Test[LCR]*.(RT|Acc) to remove whatever is in the *
@@ -60,9 +72,6 @@ all_tasklogs <-
         return(x)
     }) %>%
     bind_rows %>%
-    group_by(file) %>%
-    mutate(SessionDate=first(na.omit(SessionDate))) %>%
-    ungroup %>%
     mutate(file=gsub("../task/Pilot Subs/([0-9]+)_(KOH|LR)/","1/\\1/",file) %>%
                 gsub("-.*.txt", "", .)) %>%
     separate(file,c("year","id","task"),extra="merge",remove=F) %>%
@@ -76,13 +85,16 @@ tasktimes <-
 
 # Combine SessionDate and SessionTime into R datatime
 d <- left_join(all_tasklogs, tasktimes) %>%
-    mutate(tasktime=SessionTime %>%
+    group_by(file) %>%
+    mutate(SessionDate=first(na.omit(SessionDate)),
+           tasktime=first(na.omit(SessionTime)) %>%
                ifelse(is.na(.), "00:00:00", .) %>%
                paste(SessionDate, .) %>%
-               lubridate::mdy_hms())
+               lubridate::mdy_hms()) %>%
+    ungroup()
 
 ## make a "duration" dataframe also includes ACC and RT
-#  count reps of the [Fix-Mem-(Fix-Test)x3] pattern
+#  count reps of the Fix-Mem-(Fix-Test)x3 pattern
 mem_dur <- 3000
 test_dur <- 4500
 durs <- d %>%
@@ -93,7 +105,7 @@ durs <- d %>%
     # add durations for each side (mem_dur and test_dur)
     mutate(repnum=1:n(),
            MemL=mem_dur, MemC=mem_dur, MemR=mem_dur,
-           TestL=test_dur, TestC=test_dur, TestR=test_dur)
+           TestL=test_dur, TestC=test_dur, TestR=test_dur) 
 
 # use factor to enforce task order
 eventorder=c('Fix1' ,'MemL' ,'MemC' ,'MemR',
