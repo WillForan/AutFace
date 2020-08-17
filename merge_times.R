@@ -2,6 +2,13 @@
 library(dplyr)
 library(lubridate)
 
+# merge mr and eprime times to match mr series number to task name
+# output like
+#  id year rank mrid seqnum task tname
+#  102 1 1 111001112750 5 AUS_CMFT AUS
+# from input
+# ./mktime_mr and ./mktime_task (see Makefile)
+
 # create datetime and rank task order within visits
 # for both mr and task
 mr <- read.table('txt/times_mr.txt')  %>%

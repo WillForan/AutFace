@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# pull name and SessionDate+SessionTime from eprime task files
+# needed to match MR protocols to correct task name
+# (see ./mktime_mr ./merge_times.R)
+
 cd $(dirname $0)
 for f in ../task/Year*/*/*txt; do
   perl -ne 'm:Year (\d)/(\d+)/([^-]+):; print "$2\t$1\t$3\t"' <<< $f

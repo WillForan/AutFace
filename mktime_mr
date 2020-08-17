@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+# go through all dicom folders. use first dcm to extract
+#   id, series_number, ndcm, protocol_name, time, age, sex
+# looksl ike
+#   110308160921 001 3 circle_localizer 16:15:06.187000 044Y F
+#
+# will be used by `01_bids` to extract and name nifti files
+
 cd $(dirname $0)
 for d in ../raw/*/*; do
   A=($(find $d -type f,l -iname '*dcm' ));
