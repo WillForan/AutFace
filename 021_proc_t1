@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# run preprocessing using fmri_preprocessing_scripts
+# 20200625 - init, test with 102/ses-1
+lncdprep /data/Autism_Faces/BIDS/ /data/Autism_Faces/preproc --onlyt1 --use_ses 
