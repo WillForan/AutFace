@@ -2,6 +2,14 @@
 library(magrittr)
 library(dplyr)
 library(tidyr)
+# copy pasted from mkonsets_mem.R
+rename_events <- function(x)
+    gsub("Fixation","Fix", x) %>%
+    gsub("Front", "Left", .) %>%
+    gsub("Side", "Center", .) %>%
+    gsub("Back", "Right", .) %>%
+    gsub("(L|R|C).*\\.","\\1.",.) %>%
+    gsub("orize|ation|eft|enter|ight", "", .)
 
 # TODO: confirm first fixation is only 1.5 or 3 duration!
 # final onsets are variable. so probably have some variable start?
@@ -79,10 +87,10 @@ onsets_recall$dur[badidx_fix] <- onsets_recall$FixTime[badidx_fix]/1000
 badidx_test <- is.na(onsets_recall$dur) & onsets_recall$event == "TestSlide"
 onsets_recall$dur[badidx_test] <- 4.5
 onsets_recall <- onsets_recall %>%
-    mutate(onset=cumsum(lag(dur,default=0))) %>% select(-FixTime)
+    mutate(onset=cumsum(lag(dur,default=29)))
 
 out <-
    onsets_recall %>%  
-   select(year,id,task,tasktime,TestSlide,TestSlide.RT,CorrectResp,TestSlide.ACC,onset)
+   select(year,id,task,tasktime,trial,onset,event,FixTime,TestSlide,TestSlide.RT,CorrectResp,TestSlide.ACC)
 
-write.csv(out, "txt/onsets_recall.csv")
+write.csv(out, "txt/onsets_recall.csv", row.names=F)
