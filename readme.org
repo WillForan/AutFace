@@ -77,3 +77,59 @@ done | grep ep2d_bold
 ** Eye tracking
 
 exists. not used currently.
+
+** Timing
+
+We can model just the button pushes to confrim task timing
+
+#+begin_src R
+library(dplyr)
+d <- read.csv('./txt/onsets_mem.csv')
+x <- d %>%
+    filter(id==102, year==1,!is.na(RT), task=="AUS_CMFT") %>%
+    mutate(on=onset+RT/1000)
+sink("example/102_USA_RT.1D")
+cat(paste(collapse=" ", x$on),"\n")
+sink()
+
+sink("example/102_USATest_RT.1D")
+read.csv('./txt/onsets_recall.csv') %>%
+    filter(id==102, year==1,!is.na(TestSlide.RT), event=="TestSlide", grepl("^CMFT", task)) %>%
+    mutate(on=onset+TestSlide.RT/1000) %$%
+    paste(on, collapse=" ") %>% cat("\n")
+sink()
+    
+#+end_src
+
+#+begin_src bash :async :results none
+  test ! -d example/button && mkdir $_
+  3dDeconvolve \
+    -input ../preproc/usa/102/ses-1/sub-102_ses-1_task-USA_run-1_bold/naswdktm_func_6.nii.gz \
+    -polort 2 \
+    -num_stimts 1 \
+    -stim_label 1 "button" -stim_times 1 example/102_USA_RT.1D 'BLOCK(1)' \
+    `#-stim_label 1 "button" -stim_times 1 example/102_USA_RT.1D 'TENT(0,12,8)'` \
+    -fout -tout \
+    -bucket example/button/102USA_stats.nii.gz
+    #-iresp 1 example/button/102USA_tent.nii.gz
+
+  3dDeconvolve \
+    -overwrite \
+    -input ../preproc/usa/102/ses-1/sub-102_ses-1_task-USATest_run-1_bold/naswdktm_func_6.nii.gz \
+    -polort 2 \
+    -num_stimts 1 \
+    -stim_label 1 "button" -stim_times 1 example/102_USATest_RT.1D 'BLOCK(1)' \
+    -fout -tout \
+    -bucket example/button/102USATest_stats.nii.gz
+#+end_src
+
+file:example/button/102USA_button_motor.png
+
+** background connectivity
+
+   using "errts" timeseries after removing stimus evoked responses cite:Al_Aidroos_2012, cite:Ravindranath_2020
+
+
+* Bib
+
+bibliography:txt/cite.bib
