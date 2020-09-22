@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+for f in ../BIDS/sub-*/ses-*/func/*.json; do
+  b=$(basename $f .json)
+  echo -en "$b\t$(3dinfo -nt ${f/.json/.nii.gz})\t"
+  jq '[.SeriesNumber, .AcquisitionTime]|@tsv' -r < $f 
+done

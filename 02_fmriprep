@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'e=$?; [ $e -ne 0 ] && echo "$0 exited in error"' EXIT
+projroot=$(cd $(dirname $0)/..;pwd)
+
+#
+# run fmriprep
+#  20200626WF  init
+
+# first participant with 1 visit: sub-10985
+# freesurfer output like: FS/sub-10985/mri
+
+docker run -it\
+          -v $projroot/BIDS:/bids \
+          -v $projroot:/out \
+          poldracklab/fmriprep  \
+          --skip_bids_validation \
+          --participant-label sub-102 sub-103 \
+          --fs-no-reconall \
+          --use-aroma \
+          /bids /out  participant \
+
+#--output-spaces MNI152NLin2009cAsym
