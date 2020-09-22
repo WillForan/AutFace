@@ -130,6 +130,10 @@ file:example/button/102USA_button_motor.png
    using "errts" timeseries after removing stimus evoked responses cite:Al_Aidroos_2012, cite:Ravindranath_2020
 
 
+** ROI
+ rois from cite:mr/O_Hearn_2020
+ 2 neurosynth rois masked by HarvOx: L & R FFA
+ 10 structural ROIs: L & R for ea. FG ITG STG TPJ IFG
+ 
 * Bib
-
 bibliography:txt/cite.bib
