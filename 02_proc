@@ -29,7 +29,7 @@ ls -d /data/Autism_Faces/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses;
      echo "# have $_" &&
      continue
   test -r /data/Autism_Faces/preproc/*/$id_ses/sub-${id_ses/\//_}*task-${task}_*/.preprocessfunctional_complete && echo "# have $_" && continue
-  lncdprep /data/Autism_Faces/BIDS/ /data/Autism_Faces/preproc $id_ses --t2dir ${task,,} --pattern "*$task*nii.gz" -- -smoothing_kernel 6 -motion_censor fd=0.8,dvars=20 &
+  lncdprep /data/Autism_Faces/BIDS/ /data/Autism_Faces/preproc $id_ses --t2dir ${task,,} --pattern "*$task*nii.gz" --task -- -smoothing_kernel 6 -motion_censor fd=0.8,dvars=20 &
   waitforjobs
 done
 done
