@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+#
+# make/view QA images
+# 
+qa_usage() {
+   cat <<HD
+   $0 [stage] [otherstage yetanother]
+   where stage is any or all of
+     genbet -- generate mprage bet images (fsl's slicer)
+     all -- everything
+     bet -- view brain extraction t1
+     warp -- view func to mni warp
+     mot - see motion
+HD
+   exit 1
+}
+
+gen_mprage() {
+   cd $(dirname $0)/../preproc/
+   test -d QA/mprage || mkdir -d $_
+   for f in MHT1_2mm/*/ses-*/mprage_bet.nii.gz; do
+      o=QA/mprage/$(perl -pe '$_="$1-$2" if m:/(\d+)/ses-(\d+):' <<< $f)_bet.png
+      ! test -r $o && slicer -a $o $f
+   done
+}
+imgsview() { feh --scale-down --auto-zoom "$@"; }
+
+runqa() {
+   [ $# -eq 0 ] && qa_usage
+
+   cd $(dirname $0)/../preproc/
+   [[ "$*" =~  genbet ]] && gen_mprage
+   [[ "$*" =~  mprage|t1|bet|all ]]  && imgsview QA/mprage/*png
+   [[ "$*" =~  func|warp|temp|all ]] && imgsview */*/ses-*/*/qa_images/func_to_template.png
+   [[ "$*" =~  mot|all ]]            && imgsview */*/ses-*/*/motion_info/disp.png
+}
+
+[[ "$0" =~ /qa$ ]] && runqa "$@" || :

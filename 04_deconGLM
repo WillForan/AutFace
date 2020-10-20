@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd $(dirname "$0")
+
+final_preproc=nfaswdktm_func_6.nii.gz
+
+for aus_file in ../preproc/aus/[0-9][0-9][0-9]/ses-*/*/nfaswdktm_func_6.nii.gz;  do
+   !  [[ $aus_file =~ /([0-9][0-9][0-9]/ses-[0-9])/ ]] && echo "no id/ses- in '$aus_file'" && continue
+   idses=${BASH_REMATCH[1]}
+   preprocs=($(find ../preproc/*/$idses/ -not -ipath '*TEST*' -name $final_preproc))
+   expected_runs=3
+   test $expected_runs -ne ${#preprocs[@]} && echo "ERROR: $idses has $_/$expected_runs runs: ${preprocs[*]}" && continue
+   
+   all_censor_files="$(perl -pe "s:$final_preproc:motion_info/fd_0.8_censor.1D:g" <<< "${preprocs[@]}")"
+   all_motion_files=$(perl -pe "s:$final_preproc:motion.par:g" <<< "${preprocs[@]}") 
+
+   echo "proc: ${preprocs[@]}"
+   echo "censor: $all_censor_files"
+   echo "mot: $all_motion_files"
+   break
+
+   id_ses=${idses//\//_}
+   saveas=../glm/${id_ses}/${id_ses}_glm_bucket-MemTest.nii.gz
+   timebase=1d/sub-${id_ses}
+   
+   glmdir=$(dirname $saveas)
+   test -d  $glmdir || mkdir -p $_
+   # make motion and censor files
+   # ...._bold/motion_info/fd_0.8_censor.1D
+   # ...._bold/motion.par
+   censortr=$glmdir/fd_censor.1d
+   cat $all_censor >$censortr
+   motion=$glmdir/motion.1d
+   cat $all_motion_files > $motion
+
+
+   3dDeconvolve -input "${preprocs[@]}" \
+	 -fout -rout -tout \
+	 -overwrite \
+         -bucket $saveas \
+	 -x1D $glmdir/X.1D \
+         -polort 3 \
+         -local_times \
+         -num_stimts 9 \
+	 -censor $censortr \
+         \
+         -stim_times_AM2 1  ${timebase}/Mem.1d 'dmBLOCK' -stim_label 1 'mem' \
+         -stim_times_AM2 2  ${timebase}/Test_crct.1d 'dmBLOCK' -stim_label 2 'corr' \
+         -stim_times_AM2 3  ${timebase}/Test_err.1d 'dmBLOCK' -stim_label 3 'err' \
+         \
+         -stim_file 4 $motion'[0]' -stim_base 4  \
+         -stim_file 5 $motion'[1]' -stim_base 5  \
+         -stim_file 6 $motion'[2]' -stim_base 6  \
+         -stim_file 7 $motion'[3]' -stim_base 7  \
+         -stim_file 8 $motion'[4]' -stim_base 8  \
+         -stim_file 9 $motion'[5]' -stim_base 9  
+         -num_glt 3 \
+         -gltsym "SYM:corr -mem"  -glt_label 1 'corr-mem' \
+         -gltsym "SYM:err +corr"  -glt_label 2 'all_test' \
+         -gltsym "SYM:.5*err +.5*corr -mem"  -glt_label 2 'all_test-mem'
+	 
+   break
+
+done

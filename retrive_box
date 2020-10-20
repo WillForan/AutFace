@@ -1,0 +1,2 @@
+rclone copy  --verbose --size-only box:Collab/KOH_Aut/preproc/ ../preproc/ -L --filter "+ */1*/ses-*/*/nfaswdktm_func_6.nii.gz" --filter "- **"
+

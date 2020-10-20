@@ -1,0 +1,48 @@
+#!/usr/bin/env R
+library(glue)
+library(LNCDR)
+d <- read.csv('./txt/onsets_mem.csv')
+
+# * remove MemR,C b/c there is no jitter. make on long 9 second block(3 x 3ses)
+# * collapse Mem{L,R,C} and Test{L,R,C} into just Mem and Test
+# * enumerate runs as 'block' in order:
+#     (1) AUS(_CMFT), (2) Cars,  (3) USA (CMFT)
+# output dataframe has columns
+#   id year task event ACC onset dur block
+#
+# there are 24 events for each block. 6xMem (9s) + 6x3xTest (4.5s)
+# Tests can be accurate (ACC==1) or not
+
+
+
+mem_block_dur_secs <- 9 # mem is always together
+timing <- d %>%
+    select(id, year, task, event, ACC, onset, dur) %>%
+    filter(grepl("MemL|Test",event)) %>%
+    arrange(id, year, task, onset) %>%
+    group_by(id,year) %>%
+    mutate(event = substr(event,0, nchar(event)-1),
+           dur = ifelse(event=="Mem", mem_block_dur_secs, dur/1000),
+           block = 1+cumsum(lag(task, default=first(task)) != task))
+
+# write 1d files
+timing %>%
+    split(paste(.$id, .$year, .$event)) %>%
+    lapply(function(tdf) {
+       outname <- with(tdf,glue("1d/sub-{first(id)}_ses-{first(year)}/{first(event)}.1d"))
+
+       outdir <- dirname(outname)
+       if(!dir.exists(outdir)) dir.create(outdir, recursive=T)
+
+       nblocks <- max(tdf$block)
+       saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
+       if(first(tdf$event)=='Mem') return(saved_as)
+       corname <- gsub('.1d$','_crct.1d', outname)
+       errname <- gsub('.1d$','_err.1d', outname)
+       tdf %>%
+           filter(ACC==1) %>%
+           save1D('onset', corname, dur='dur', nblocks=nblocks)
+       tdf %>%
+           filter(ACC==0) %>%
+           save1D('onset', errname, dur='dur', nblocks=nblocks)
+       })
