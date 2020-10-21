@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+for d in ../preproc/usa/*/*/*task-USATest_run-1_bold/; do new=${d/usa/usatest}; [ -d $new ] && continue; mkdir -p $(dirname $new); mv $d $new;  done
+for d in ../preproc/aus/*/*/*task-AUSTest_run-1_bold/; do new=${d/aus/austest}; [ -d $new ] && continue; mkdir -p $(dirname $new); mv $d $new;  done
+for d in ../preproc/cars/*/*/*task-CarsTest_run-1_bold/; do new=${d/cars/carstest}; [ -d $new ] && continue; mkdir -p $(dirname $new);  mv $d $new;  done
+for f in ../preproc/*/*/*/*/.preprocessfunctional_complete; do d=$(cd $(dirname $f); pwd); \ls -1d $d/{ica_aroma,?aswdktm*,n?aswdktm_f*}; done > txt/to_rm.ls

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+env | grep -q ^DRYRUN= && DRYRUN=echo || DRYRUN=""
+
+#
+# successfully ran but since removed files! :(
+# rerun just what needs to be done to get back to nfaswdktm_func_6.nii.gz
+#   most skips 4dSliceMotion and wavelet despiking. still need to re-run ica_aroma
+#
+# ./redo_preproc aus cars usa
+#
+# DRYRUN=1 ./redo_preproc aus cars usa | grep -Eo '(aus|cars|usa)' | sort | uniq -c
+#
+
+function redo_preproc(){
+    cd "$1"
+    [ -r nfaswdktm_func_6.nii.gz ] && return
+    [ ! -r _func.nii.gz ] && echo "# no data for $(pwd)!" && return
+    torm=".preprocessfunctional_complete .mean_final_func_complete .nuisance_regression_complete .rescaling_complete"
+    [ ! -r faswdktm_func_6.nii.gz ] && torm="$torm .temporal_filtering_complete"
+    [ ! -r aswdktm_func_6.nii.gz ] && torm="$torm .ica_aroma_complete"
+    [ ! -r swdktm_func_6.nii.gz ] && torm="$torm .smoothing_complete"
+    [ ! -r wdktm_func.nii.gz ] && torm="$torm .warp_complete"
+    echo "# $(pwd): $torm"
+    [ -n "$DRYRUN" ] && return
+    rm $torm
+    yes | preprocessFunctional 
+    
+}
+
+cd $(dirname $0)
+[ $# -eq 0 ] &&
+   dirs=($(pwd)/../preproc/{aus,cars,usa}/*/ses*/*bold/) ||
+   dirs=($(printf "$(pwd)/../preproc/%s/*/ses*/*bold/ " "$@"))
+for d in "${dirs[@]}"; do
+    redo_preproc $d
+done

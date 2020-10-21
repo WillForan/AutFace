@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+use strict; use warnings;
+my $sep="[/_]";
+if($#ARGV>=0 and $ARGV[0] =~ m:^[/_]$:) { $sep=shift @ARGV}
+while(<>){print "$1\n" if m:sub-(\d+${sep}ses-\d):}
