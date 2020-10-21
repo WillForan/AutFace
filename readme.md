@@ -1,6 +1,8 @@
 # Autism Faces
 Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 
+[`Makefile`](./Makefile) outlines the full pipeline
+
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
 * `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
@@ -20,6 +22,9 @@ The file prefix has can be read as the preprocessing steps right to left:
 
 ## Task
 ### memory
+
+![timeline](img/AUS_eprime_timeline_screenshot.png)
+
 3 Stimulus perspectives are shown for each object. The order is always the same.
 For `AUS` and `CMFT (USA)`, the order is `Left, Center, Right`; for `Cars` this is `Front, Side, Back`. When combining Left=Front, Center=Side, Right=Back.
 
@@ -111,7 +116,9 @@ There are 30 trials per AUS, USA, cars like Fix+Test. The response window is 4.5
 * `Test{L,R,C}` are each treated as a single type of 4.5 secs event. But are broken up by accuracy.
   * all together are also available as e.g. `1d/sub-103_ses-1/Test.1d` (c.f `1d/sub-103_ses-1/Test_{crct,err}.1d`)
 
-The 1D files are generated with `03_1dTiming`, and the models with `04_deconGLM`.
+The 1D files are generated with `03_1dTiming` and the models with `04_deconGLM`.
+
+
 Motor and visual differences between `Test` and `Mem` illustrated here: 
 ![motor](img/glm/motor.png)
 ![vis](img/glm/visual.png)
