@@ -7,18 +7,33 @@ Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 * `01_bids`                 - raw dcm to BIDS standard
 * `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
 
+### Bold
+
 `nfaswdktm_func_6.nii.gz`, the per run output of preprocesing is an MNI space T2\* image.
 See [`fmri_processing_Scripts`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts).
 
 The file prefix has can be read as the preprocessing steps right to left:
-* `mt` - 4d slice motion
+* `tm` - 4d slice motion
 * `k` - skull strip
 * `d` - wavelet despiking
 * `w` - warp to mni
+* `s` - susan smoothing with 6mm kernal
 * `a` - `ica_aroma`
 * `f` - highpass filter
-* `s` - susan smoothing with 6mm kernal
 * `n` - normalized timeseries to `1000*median`
+
+Shown here with `9s Mem` event stimulus for reference (see "Timing" for more on that).
+![nfaswdktm](img/102_afni_bold-aus_ideal-mem.png)
+
+### Motion
+`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt.
+
+see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motion.par` and `motion_info/*png`.
+![motion](img/102_aus_motion.png)
+
+```
+1dplot -sepscl motion.par
+```
 
 ## Task
 
@@ -126,6 +141,12 @@ There are 30 trials per AUS, USA, cars like Fix+Test. The response window is 4.5
   * all together are also available as e.g. `1d/sub-103_ses-1/Test.1d` (c.f `1d/sub-103_ses-1/Test_{crct,err}.1d`)
 
 The 1D files are generated with `03_1dTiming` and the models with `04_deconGLM`.
+
+```bash
+1dgrayplot ../glm/102_ses-1/X.1D
+```
+
+![Xmat](img/glm_mem-test_Xmat.png)
 
 
 Motor and visual differences between `Test` and `Mem` illustrated here: 
