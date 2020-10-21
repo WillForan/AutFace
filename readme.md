@@ -1,6 +1,23 @@
 # Autism Faces
 Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 
+## Preprocessing
+* `01_bids`                 - raw dcm to BIDS standard
+* `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
+
+`nfaswdktm_func_6.nii.gz`, the per run output of preprocesing is an MNI space T2\* image.
+See [`fmri_processing_Scripts`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts).
+
+The file prefix has can be read as the preprocessing steps right to left:
+* `mt` - 4d slice motion
+* `k` - skull strip
+* `d` - wavelet despiking
+* `w` - warp to mni
+* `a` - `ica_aroma`
+* `f` - highpass filter
+* `s` - susan smoothing with 6mm kernal
+* `n` - normalized timeseries to `1000*median`
+
 ## Task
 ### memory
 3 Stimulus perspectives are shown for each object. The order is always the same.
@@ -22,8 +39,9 @@ For `AUS` and `CMFT (USA)`, the order is `Left, Center, Right`; for `Cars` this 
 | TestR | 4.5            |
 
 ### recall
-30 trials per AUS, USA, cars like Fix+Test. Resposne window is 4.5 seconds. Fixation is variable. Unclear if first fixation is known!
-
+There are 30 trials per AUS, USA, cars like Fix+Test. The response window is 4.5 seconds. Fixation is variable. First fixation is 9 seconds. It's followed by 20s of review.
+![9 secs fixation](img/cond2_eprime_screenshot.png)
+![20 secs review](img/cond2_eprime_screenshot_20sReview.png)
 
 3 (AUS, USA, Cars) versions with 30 reps of
 
@@ -85,13 +103,21 @@ For `AUS` and `CMFT (USA)`, the order is `Left, Center, Right`; for `Cars` this 
 226*1.5 = 339
 ```
 
+## GLM
+
+### CMFT/Cond1
+* `aus`, `cars`, and `usa` (CMFT, cond1) are combined. 
+* each `Mem{L,R,C}` set are treated as a single 9 secs event.
+* `Test{L,R,C}` are each treated as a single type of 4.5 secs event. But are broken up by accuracy.
+  * all together are also available as e.g. `1d/sub-103_ses-1/Test.1d` (c.f `1d/sub-103_ses-1/Test_{crct,err}.1d`)
+
+The 1D files are generated with `03_1dTiming`, and the models with `04_deconGLM`.
+Motor and visual differences between `Test` and `Mem` illustrated here: 
+![motor](img/glm/motor.png)
+![vis](img/glm/visual.png)
 
 ## TODO
-* datalad
-* `bids.py` - confirm `sdim4` uniquely IDs which task (USA, AUS, CARS, rest)
-  * json side card is where?
-  * see https://nipype.readthedocs.io/en/latest/api/generated/nipype.interfaces.dcm2nii.html
-* compare generated mrid<->id pairs to previous iterations
-* extract event timing from eprime log files
-* preprocess
-* deconvolve/PPI
+* break up Test events by novel or not
+* GLM for Cond2
+* generate `errts` timeseries from 3dDeconvolve
+* datalad (half implemented)

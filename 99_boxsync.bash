@@ -19,7 +19,11 @@ copy="$*"
     -L --bwlimit 5M --max-size 15G -v --copy-links --size-only
 
 [[ "$copy" =~ task ]] &&
-rclone copy ../task box:Collab/KOH_Aut/ \
+rclone copy ../task box:Collab/KOH_Aut/task \
+   -L --bwlimit 5M --max-size 15G -v --copy-links --size-only
+
+[[ "$copy" =~ glm ]] &&
+rclone copy ../glm box:Collab/KOH_Aut/glm \
    -L --bwlimit 5M --max-size 15G -v --copy-links --size-only
 
 
