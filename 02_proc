@@ -22,7 +22,7 @@ waitforjobs(){
 }
 
 # TODO: for task in AUS Car and USA
-for task in AUS Cars USA CarsTest USATest; do
+for task in AUS Cars USA AUSTest CarsTest USATest; do
 ls -d /data/Autism_Faces/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses; do
   #echo $id_ses $(date) | tee runlog_aus.log
   # /data/Autism_Faces/preproc/aus/103/ses-1/sub-103_ses-1_task-AUS_run-1_bold/.preproc
@@ -31,6 +31,7 @@ ls -d /data/Autism_Faces/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses;
      continue
   test -r /data/Autism_Faces/preproc/*/$id_ses/sub-${id_ses/\//_}*task-${task}_*/.preprocessfunctional_complete && echo "# have $_" && continue
   $DRYRUN lncdprep /data/Autism_Faces/BIDS/ /data/Autism_Faces/preproc $id_ses --t2dir ${task,,} --pattern "*${task}_*nii.gz" --task -- -smoothing_kernel 6 -motion_censor fd=0.8,dvars=20 &
+  [ -n "$DRYRUN" ] && sleep .2 # enough time for above to fail and not block for a minute
   waitforjobs
 done
 done
