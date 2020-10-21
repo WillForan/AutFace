@@ -21,6 +21,15 @@ The file prefix has can be read as the preprocessing steps right to left:
 * `n` - normalized timeseries to `1000*median`
 
 ## Task
+
+### Timing
+Task timing were extracted from eprime txt log files and are save as long (line/row per event) CSVs. See `mkonsets_{mem,recall}.R` on top of `tasklog` (also [`eplog`](https://github.com/LabNeuroCogDevel/lncdtools)).
+
+* [`txt/onsets_mem.csv`](txt/onset_mem.csv) -- `"year","id","task","tasktime","repnum","event","ACC","dur","RT","onset"`
+* [`txt/onsets_recall.csv`](txt/onset_recall.csv) -- `"year","id","task","tasktime","trial","onset","event","FixTime","TestSlide","TestSlide.RT","CorrectResp","TestSlide.ACC"`
+
+The scripts `mktime_mr` and `mktime_task` are used by `merge_times.R` to match MR and Eprime run order.
+
 ### memory
 
 ![timeline](img/AUS_eprime_timeline_screenshot.png)
