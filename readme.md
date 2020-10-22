@@ -26,7 +26,10 @@ Shown here with `9s Mem` event stimulus for reference (see "Timing" for more on 
 ![nfaswdktm](img/102_afni_bold-aus_ideal-mem.png)
 
 ### Motion
-`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt.
+`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt. Framewise displacement is also calculated. GLM censors `fd > .8` ([motion_info.R](motion_info.R)).
+
+![fd](img/n_fd-gt-thres_hist.png)
+
 
 see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motion.par` and `motion_info/*png`.
 ![motion](img/102_aus_motion.png)
@@ -154,6 +157,8 @@ Motor and visual differences between `Test` and `Mem` illustrated here:
 ![vis](img/glm/visual.png)
 
 ## TODO
+* Find ages and Diagg=="NA"
+* censor previous TR to large motion? kick out high motion people?
 * break up Test events by novel or not
 * GLM for Cond2
 * generate `errts` timeseries from 3dDeconvolve
