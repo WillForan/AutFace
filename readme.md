@@ -7,6 +7,9 @@ Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 Imaging and task data is on box.
 See [`retrive_box`](retrive_box) using [rclone](https://rclone.org/box/). [`99_boxsync.bash`](99_boxsync.bash) was used to upload.
 
+Disk usage for final output of preprocessing is about *115 Gb*. `124 visits * 155 Mb * 6 scans.` 
+Entire preprocessing pipeline (for QA, rerunning, and auditing) is ~1Tb (`124*6*1.3G).
+
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
 * `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
