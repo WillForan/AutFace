@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+nses=$(ls -d /data/Autism_Faces/BIDS/sub-*/ses-*/ | wc -l)
+echo "task done started total"
+for t in aus cars usa austest carstest usatest; do
+   ndone=$(ls /data/Autism_Faces/preproc/$t/*/ses-*/sub-*_bold/nfaswdktm_func_6.nii.gz|wc -l)
+   nstarted=$(ls -d /data/Autism_Faces/preproc/$t/*/ses-*/sub-*_bold/ | wc -l)
+   echo "$t $ndone $nstarted $nses"
+done
