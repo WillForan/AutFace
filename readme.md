@@ -3,6 +3,10 @@ Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 
 [`Makefile`](./Makefile) outlines the full pipeline
 
+## Data TX
+Imaging and task data is on box.
+See [`retrive_box`](retrive_box) using [rclone](https://rclone.org/box/). [`99_boxsync.bash`](99_boxsync.bash) was used to upload.
+
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
 * `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
@@ -26,12 +30,14 @@ Shown here with `9s Mem` event stimulus for reference (see "Timing" for more on 
 ![nfaswdktm](img/102_afni_bold-aus_ideal-mem.png)
 
 ### Motion
-`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt. Framewise displacement is also calculated. GLM censors `fd > .8` ([motion_info.R](motion_info.R)).
+`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt. Framewise displacement is also calculated. GLM censors `fd > .8` ([`motion_info.R`](motion_info.R)).
 
-![fd](img/n_fd-gt-thres_hist.png)
+[<img src=img/n_fd-gt-thres_hist.png width=400px>](img/n_fd-gt-thres_hist.png)
 
 
 see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motion.par` and `motion_info/*png`.
+
+
 ![motion](img/102_aus_motion.png)
 
 ```
@@ -72,6 +78,8 @@ For `AUS` and `CMFT (USA)`, the order is `Left, Center, Right`; for `Cars` this 
 
 ### recall
 There are 30 trials per AUS, USA, cars like Fix+Test. The response window is 4.5 seconds. Fixation is variable. First fixation is 9 seconds. It's followed by 20s of review.
+
+
 ![9 secs fixation](img/cond2_eprime_screenshot.png)
 ![20 secs review](img/cond2_eprime_screenshot_20sReview.png)
 
