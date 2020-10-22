@@ -1,5 +1,6 @@
 # Autism Faces
 Functional MR collected from 2011-2014. Includes 3 sets (aus faces, usa faces, cars) of 2 (mem, recall) EPrime tasks.
+Two matched groups: ASD and TD.
 
 [`Makefile`](./Makefile) outlines the full pipeline
 
