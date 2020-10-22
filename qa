@@ -16,6 +16,11 @@ HD
    exit 1
 }
 
+t1_ts(){
+   4dConcatSubBriks -idregex '\d{3}.ses-\d' ../preproc/QA/all_t1.nii.gz  '../preproc/MHT1_2mm/*/ses-*/mprage_warp_linear.nii.gz'
+}
+
+
 gen_mprage() {
    cd $(dirname $0)/../preproc/
    test -d QA/mprage || mkdir -d $_
@@ -30,7 +35,7 @@ runqa() {
    [ $# -eq 0 ] && qa_usage
 
    cd $(dirname $0)/../preproc/
-   [[ "$*" =~  genbet ]] && gen_mprage
+   [[ "$*" =~  genbet ]] && gen_mprage && t1_ts
    [[ "$*" =~  mprage|t1|bet|all ]]  && imgsview QA/mprage/*png
    [[ "$*" =~  func|warp|temp|all ]] && imgsview */*/ses-*/*/qa_images/func_to_template.png
    [[ "$*" =~  mot|all ]]            && imgsview */*/ses-*/*/motion_info/disp.png

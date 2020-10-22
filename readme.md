@@ -47,6 +47,11 @@ see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motio
 1dplot -sepscl motion.par
 ```
 
+### QA
+
+* look at all T1 linear warps. Okay? But 2 large ventrical participants. 
+![T1](img/QA_mprage_116.png)
+
 ## Task
 
 ### Timing

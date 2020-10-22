@@ -35,4 +35,5 @@ EOF
 # + MHT1_2mm/[12]*/ses-*/{mprage.nii.gz,mprage_bet.nii.gz,mprage_warpcoef.nii.gz,mprage_nonlinear_warp_MNI_2mm.nii.gz,mprage_warp_linear.nii.gz,preprocessMprage.log}
 rclone copy ../preproc/ box:Collab/KOH_Aut/preproc \
    -L --bwlimit 5M --max-size 15G -v --copy-links --size-only \
+   --immutable \
    --filter-from txt/tx_filter.txt
