@@ -9,7 +9,7 @@ See [`retrive_box`](retrive_box) using [rclone](https://rclone.org/box/). [`99_b
 
 The disk usage for just the final output of preprocessing is about **115 Gb**. `124 visits * 155 Mb * 6 scans.` 
 
-The entire preprocessing pipeline -- useful for QA, rerunning, and auditing -- is ~1Tb (`124*6*1.3G).
+The entire preprocessing pipeline -- useful for QA, rerunning, and auditing -- is ~1Tb (`124*6*1.3G`).
 
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
