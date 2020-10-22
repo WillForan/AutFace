@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 env | grep -q ^DRYRUN= && DRYRUN=echo || DRYRUN=""
+trap 'e=$?; [ $e -ne 0 ] && echo "$0 exited in error $e"' EXIT
 
 #
 # successfully ran but since removed files! :(
@@ -24,8 +25,8 @@ function redo_preproc(){
     echo "# $(pwd): $torm"
     [ -n "$DRYRUN" ] && return
     rm $torm
-    yes | preprocessFunctional 
-    
+    yes | preprocessFunctional  || :
+    return 0
 }
 
 cd $(dirname $0)
@@ -33,5 +34,5 @@ cd $(dirname $0)
    dirs=($(pwd)/../preproc/{aus,cars,usa}/*/ses*/*bold/) ||
    dirs=($(printf "$(pwd)/../preproc/%s/*/ses*/*bold/ " "$@"))
 for d in "${dirs[@]}"; do
-    redo_preproc $d
+    redo_preproc $d || :
 done
