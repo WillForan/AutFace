@@ -50,6 +50,7 @@ see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motio
 
 ### QA
 
+* [`qa`](qa) - script to collect and view qa collections
 * warping: inspecting all T1<->MNI linear warps as a time series -- point per visit. Okay? But 2 large ventricles participants. 
   - looking for bad skullstrip or misaligned warp.
 
@@ -177,8 +178,13 @@ Motor and visual differences between `Test` and `Mem` illustrated here:
 
 ## TODO
 * Find ages and Diagg=="NA"
-* censor previous TR to large motion? kick out high motion people?
-* break up Test events by novel or not
-* GLM for Cond2
-* generate `errts` timeseries from 3dDeconvolve
+* QA func w/roi TS
+* GLM
+   * break up Test events by novel or not (find info in eprime log)
+   * add global signal? csf? wm? other regressors?
+   * censor previous TR to large motion? kick out high motion people?
+   * generate `errts` timeseries from 3dDeconvolve
+   * Cond2. Ever analysed? 
+* ROI coef extract. Which rois?
+* simple 3dttest++ w/ASD vs TD
 * datalad (half implemented)
