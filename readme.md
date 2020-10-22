@@ -1,5 +1,5 @@
 # Autism Faces
-Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
+Functional MR collected from 2011-2014. Includes 3 sets (aus faces, usa faces, cars) of 2 (mem, recall) EPrime tasks.
 
 [`Makefile`](./Makefile) outlines the full pipeline
 
@@ -7,16 +7,17 @@ Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
 Imaging and task data is on box.
 See [`retrive_box`](retrive_box) using [rclone](https://rclone.org/box/). [`99_boxsync.bash`](99_boxsync.bash) was used to upload.
 
-Disk usage for final output of preprocessing is about *115 Gb*. `124 visits * 155 Mb * 6 scans.` 
-Entire preprocessing pipeline (for QA, rerunning, and auditing) is ~1Tb (`124*6*1.3G).
+The disk usage for just the final output of preprocessing is about **115 Gb**. `124 visits * 155 Mb * 6 scans.` 
+
+The entire preprocessing pipeline -- useful for QA, rerunning, and auditing -- is ~1Tb (`124*6*1.3G).
 
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
-* `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
+* `021_proc_t1` + `02_proc` - [`lncdprep`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts) preprocessing
 
 ### Bold
 
-`nfaswdktm_func_6.nii.gz`, the per run output of preprocesing is an MNI space T2\* image.
+`nfaswdktm_func_6.nii.gz` is the per run MNI space T2\* image output of preprocesing.
 See [`fmri_processing_Scripts`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts).
 
 The file prefix has can be read as the preprocessing steps right to left:
@@ -27,7 +28,7 @@ The file prefix has can be read as the preprocessing steps right to left:
 * `s` - susan smoothing with 6mm kernal
 * `a` - `ica_aroma`
 * `f` - highpass filter
-* `n` - normalized timeseries to `1000*median`
+* `n` - normalized timeseries to `10000/globalmedian`
 
 Shown here with `9s Mem` event stimulus for reference (see "Timing" for more on that).
 ![nfaswdktm](img/102_afni_bold-aus_ideal-mem.png)
@@ -49,7 +50,9 @@ see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motio
 
 ### QA
 
-* look at all T1 linear warps. Okay? But 2 large ventrical participants. 
+* warping: inspecting all T1<->MNI linear warps as a time series -- point per visit. Okay? But 2 large ventricles participants. 
+  - looking for bad skullstrip or misaligned warp.
+
 ![T1](img/QA_mprage_116.png)
 
 ## Task
