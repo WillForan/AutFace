@@ -1,15 +1,24 @@
 # Autism Faces
-Functional MR collected from 2011-2014 with participant preforming EPrime tasks.
+Functional MR collected from 2011-2014. Includes 3 sets (aus faces, usa faces, cars) of 2 (mem, recall) EPrime tasks.
+Two matched groups: ASD and TD.
 
 [`Makefile`](./Makefile) outlines the full pipeline
 
+## Data TX
+Imaging and task data is on box.
+See [`retrive_box`](retrive_box) using [rclone](https://rclone.org/box/). [`99_boxsync.bash`](99_boxsync.bash) was used to upload.
+
+The disk usage for just the final output of preprocessing is about **115 Gb**. `124 visits * 155 Mb * 6 scans.` 
+
+The entire preprocessing pipeline -- useful for QA, rerunning, and auditing -- is ~1Tb (`124*6*1.3G`).
+
 ## Preprocessing
 * `01_bids`                 - raw dcm to BIDS standard
-* `021_proc_t1` + `02_proc` - `lncdprep` preprocessing
+* `021_proc_t1` + `02_proc` - [`lncdprep`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts) preprocessing
 
 ### Bold
 
-`nfaswdktm_func_6.nii.gz`, the per run output of preprocesing is an MNI space T2\* image.
+`nfaswdktm_func_6.nii.gz` is the per run MNI space T2\* image output of preprocesing.
 See [`fmri_processing_Scripts`](https://github.com/LabNeuroCogDevel/fmri_processing_scripts).
 
 The file prefix has can be read as the preprocessing steps right to left:
@@ -20,20 +29,33 @@ The file prefix has can be read as the preprocessing steps right to left:
 * `s` - susan smoothing with 6mm kernal
 * `a` - `ica_aroma`
 * `f` - highpass filter
-* `n` - normalized timeseries to `1000*median`
+* `n` - normalized timeseries to `10000/globalmedian`
 
 Shown here with `9s Mem` event stimulus for reference (see "Timing" for more on that).
 ![nfaswdktm](img/102_afni_bold-aus_ideal-mem.png)
 
 ### Motion
-`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt.
+`mt` 4dslice+motion alignment computes trans and rot motion paramaters in `motion.par` a la fsl's mcflirt. Framewise displacement is also calculated. GLM censors `fd > .8` ([`motion_info.R`](motion_info.R)).
+
+[<img src=img/n_fd-gt-thres_hist.png width=400px>](img/n_fd-gt-thres_hist.png)
+
 
 see in e.g. `../preproc/aus/102/ses-1/sub-102_ses-1_task-AUS_run-1_bold/` `motion.par` and `motion_info/*png`.
+
+
 ![motion](img/102_aus_motion.png)
 
 ```
 1dplot -sepscl motion.par
 ```
+
+### QA
+
+* [`qa`](qa) - script to collect and view qa collections
+* warping: inspecting all T1<->MNI linear warps as a time series -- point per visit. Okay? But 2 large ventricles participants. 
+  - looking for bad skullstrip or misaligned warp.
+
+![T1](img/QA_mprage_116.png)
 
 ## Task
 
@@ -69,6 +91,8 @@ For `AUS` and `CMFT (USA)`, the order is `Left, Center, Right`; for `Cars` this 
 
 ### recall
 There are 30 trials per AUS, USA, cars like Fix+Test. The response window is 4.5 seconds. Fixation is variable. First fixation is 9 seconds. It's followed by 20s of review.
+
+
 ![9 secs fixation](img/cond2_eprime_screenshot.png)
 ![20 secs review](img/cond2_eprime_screenshot_20sReview.png)
 
@@ -154,7 +178,14 @@ Motor and visual differences between `Test` and `Mem` illustrated here:
 ![vis](img/glm/visual.png)
 
 ## TODO
-* break up Test events by novel or not
-* GLM for Cond2
-* generate `errts` timeseries from 3dDeconvolve
+* Find ages and Diagg=="NA"
+* QA func w/roi TS
+* GLM
+   * break up Test events by novel or not (find info in eprime log)
+   * add global signal? csf? wm? other regressors?
+   * censor previous TR to large motion? kick out high motion people?
+   * generate `errts` timeseries from 3dDeconvolve
+   * Cond2. Ever analysed? 
+* ROI coef extract. Which rois?
+* simple 3dttest++ w/ASD vs TD
 * datalad (half implemented)

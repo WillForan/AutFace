@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+cd $(dirname $0)
+DATADIR=$(cd ../; pwd)
+nses=$(ls -d $DATADIR/BIDS/sub-*/ses-*/ | wc -l)
+echo "task done started total"
+for t in aus cars usa austest carstest usatest; do
+   ndone=$(ls $DATADIR/preproc/$t/*/ses-*/sub-*_bold/nfaswdktm_func_6.nii.gz|wc -l)
+   nstarted=$(ls -d $DATADIR/preproc/$t/*/ses-*/sub-*_bold/ | wc -l)
+   echo "$t $ndone $nstarted $nses"
+done

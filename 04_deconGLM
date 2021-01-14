@@ -19,7 +19,7 @@ for aus_file in ../preproc/aus/[0-9][0-9][0-9]/ses-*/*/nfaswdktm_func_6.nii.gz; 
    all_censor_files="$(perl -pe "s:$final_preproc:motion_info/fd_0.8_censor.1D:g" <<< "${preprocs[@]}")"
    all_motion_files=$(perl -pe "s:$final_preproc:motion.par:g" <<< "${preprocs[@]}") 
 
-   echo "proc: ${preprocs[@]}"
+   echo "proc: ${preprocs[*]}"
    echo "censor: $all_censor_files"
    echo "mot: $all_motion_files"
 
