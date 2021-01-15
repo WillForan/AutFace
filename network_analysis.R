@@ -1,4 +1,9 @@
 #!/usr/bin/env R
+
+# 20210114WF - init
+# pull WFU (CW, RB) Network Analysis
+# subset columns, merge ID, add behavior
+
 library(dplyr)
 ids <- read.table('txt/mrid_id.txt', h=T)
 net <- read.csv('txt/AUT_NetworkAnalysis_0.5000.csv')
