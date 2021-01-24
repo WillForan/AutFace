@@ -6,6 +6,8 @@
 # 20200706 - current docker has issue with "rel" ?
 # --docker lncd/preproc:min
 # using pyenv to get local python working
+# 20210122 - copied into rest
+# TODO: merge
 env |grep -q '^DRYRUN=' && DRYRUN=echo || DRYRUN=""
 cd $(dirname $0)
 data_root=$(cd ../; pwd)
@@ -24,7 +26,7 @@ waitforjobs(){
 }
 
 # TODO: for task in AUS Car and USA
-for task in AUS Cars USA AUSTest CarsTest USATest; do
+for task in rest; do
 ls -d $data_root/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses; do
   #echo $id_ses $(date) | tee runlog_aus.log
   # /data/Autism_Faces/preproc/aus/103/ses-1/sub-103_ses-1_task-AUS_run-1_bold/.preproc
@@ -33,8 +35,9 @@ ls -d $data_root/BIDS/sub-*/ses-* |sed 's:.*sub-::' | while read id_ses; do
      continue
   test -r $data_root/preproc/*/$id_ses/sub-${id_ses/\//_}*task-${task}_*/.preprocessfunctional_complete && echo "# have $_" && continue
   $DRYRUN lncdprep $data_root/BIDS/ $data_root/preproc $id_ses \
-     --t2dir ${task,,} --pattern "*${task}_*nii.gz" --task \
-     -- -smoothing_kernel 6 -motion_censor fd=0.8,dvars=20 &
+     --t2dir ${task,,} --pattern "*${task}_*nii.gz" --rest \
+     -- -smoothing_kernel 6 -gsr -nuisance_regression 6motion,d6motion,csf,dcsf,wm,dwm,gs &
+  
   [ -n "$DRYRUN" ] && sleep .2 # enough time for above to fail and not block for a minute
   waitforjobs
 done
