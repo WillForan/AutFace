@@ -42,3 +42,17 @@ txt/onsets_recall.csv: txt/eprime/test_AUS_CMFT.tsv
 .make/glms_memtest.ls: .make/preproc.ls .make/1dfiles.ls
 	# ./04_deconGLM
 	mkls $@ '../glm/*_ses*/*glm_bucket-MemTest.nii.gz'
+
+
+txt/dt/glm_faceVcar.txt:
+	./05_mkttest_in.R
+
+masks/memtask_coverageGT200.nii.gz:
+	./mk_coverage_mask.bash
+
+masks/memtask_coverageGT200.nii.gz:
+	./05_mkttest_in.R
+
+../stats/face-mem_ttest.nii.gz: txt/dt/glm_faceVcar.txt masks/memtask_coverageGT200.nii.gz
+	./05_ttest-faceVsMem.bash
+
