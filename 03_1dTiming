@@ -2,7 +2,7 @@
 library(glue)
 library(LNCDR)
 # recusrively create folders called for by a file name
-mkdir_for <- function(outfile) {
+mkdir_for <- function(outname) {
     outdir <- dirname(outname)
     if(!dir.exists(outdir)) dir.create(outdir, recursive=T)
     return(outdir)
@@ -31,14 +31,21 @@ timing <- d %>%
     mutate(event = substr(event,0, nchar(event)-1),
            dur = ifelse(event=="Mem", mem_block_dur_secs, dur/1000),
            block = 1+cumsum(lag(task, default=first(task)) != task),
-           task = gsub('^CMFT','USA',task) %>% gsub('AUS_CMFT','AUS', .))
+           task = gsub('^CMFT','USA',task) %>% gsub('AUS_CMFT','AUS', .),
+           totalruns = max(block))
 
-# check on order -- sometimes AUS is missing?
-rle(sort(paste(timing$task,timing$block,sep=".")))
+# check on order -- 3 ids (201, 216, 260) do not have all runs
+timing %>% filter(totalruns!=3) %>% group_by(id,year) %>% summarise(task=paste(collapse=",", unique(task)))
+#    id  year task    
+#   201     1 Cars    
+#   216     1 AUS,Cars
+#   260     1 Cars,USA
 
-write_by_acc <- function(tdf, outname){
+write_by_acc <- function(tdf, outname, nblocks){
   # write ACC==1 to _crct.1d and ACC==0 to _err.1d
   # skip if event is Mem
+
+  saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
   if(first(tdf$event)=='Mem') return(saved_as)
   corname <- gsub('.1d$','_crct.1d', outname)
   errname <- gsub('.1d$','_err.1d', outname)
@@ -56,16 +63,16 @@ by_event %>% lapply(function(tdf) {
        outname <- with(tdf[1,],glue("1d/sub-{id}_ses-{year}/{event}.1d"))
        mkdir_for(outname)
        nblocks <- max(tdf$block)
-       saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
-       write_by_acc(tdf, outname)
+       write_by_acc(tdf, outname, nblocks)
 })
 
 
+# 20210124 - write each event out individually
+#   BUT add empty rows for where the other tasks would be
 by_task_event <- timing %>% split(paste(.$id, .$year, .$task, .$event))
 by_task_event %>% lapply(function(tdf) {
        outname <- with(tdf[1,],glue("1d/sub-{id}_ses-{year}/{task}/{event}.1d"))
        mkdir_for(outname)
-       nblocks <- 3
-       saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
-       write_by_acc(tdf, outname)
+       nblocks <- 3 # HARDCODE -- only use these when all blocks are present
+       write_by_acc(tdf, outname, nblocks)
 })

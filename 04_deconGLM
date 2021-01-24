@@ -76,6 +76,7 @@ for aus_file in ${PREPROC_INPUT[@]};  do
          -local_times \
          -num_stimts 15 \
          -censor $censortr \
+         -GOFORIT 5 `#no errors in test1d cause matrix issues` \
          \
          -stim_file 1 $motion'[0]' -stim_base 1  -stim_label 1 "tx"\
          -stim_file 2 $motion'[1]' -stim_base 2  -stim_label 2 "ty"\
@@ -101,6 +102,6 @@ for aus_file in ${PREPROC_INPUT[@]};  do
          -gltsym "SYM:Acorr +Ccorr +Ucorr -Amem -Cmem -Umem"  -glt_label 4 'corr-mem' \
          -gltsym "SYM:Acorr +Ccorr +Ucorr +Aerr +Cerr +Uerr"  -glt_label 5 'all_test' \
          -gltsym "SYM:.5*Acorr +.5*Ccorr +.5*Ucorr +.5*Aerr +.5*Cerr +.5*Uerr -Amem -Cmem -Umem"  -glt_label 6 'allresp-mem' \
-         -gltsym "SYM:.5*Acorr +.5*Ucorr -Ccorr"  -glt_label 7 'face-car_corr'
+         -gltsym "SYM:.5*Acorr +.5*Ucorr -Ccorr"  -glt_label 7 'face-car_corr' || continue
 
 done
