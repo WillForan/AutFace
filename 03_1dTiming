@@ -1,7 +1,14 @@
 #!/usr/bin/env Rscript
 library(glue)
 library(LNCDR)
-d <- read.csv('./txt/onsets_mem.csv')
+# recusrively create folders called for by a file name
+mkdir_for <- function(outfile) {
+    outdir <- dirname(outname)
+    if(!dir.exists(outdir)) dir.create(outdir, recursive=T)
+    return(outdir)
+}
+
+d <- read.csv('./txt/onsets_mem.csv', stringsAsFactors=F)
 
 # * remove MemR,C b/c there is no jitter. make on long 9 second block(3 x 3ses)
 # * collapse Mem{L,R,C} and Test{L,R,C} into just Mem and Test
@@ -23,26 +30,42 @@ timing <- d %>%
     group_by(id,year) %>%
     mutate(event = substr(event,0, nchar(event)-1),
            dur = ifelse(event=="Mem", mem_block_dur_secs, dur/1000),
-           block = 1+cumsum(lag(task, default=first(task)) != task))
+           block = 1+cumsum(lag(task, default=first(task)) != task),
+           task = gsub('^CMFT','USA',task) %>% gsub('AUS_CMFT','AUS', .))
+
+# check on order -- sometimes AUS is missing?
+rle(sort(paste(timing$task,timing$block,sep=".")))
+
+write_by_acc <- function(tdf, outname){
+  # write ACC==1 to _crct.1d and ACC==0 to _err.1d
+  # skip if event is Mem
+  if(first(tdf$event)=='Mem') return(saved_as)
+  corname <- gsub('.1d$','_crct.1d', outname)
+  errname <- gsub('.1d$','_err.1d', outname)
+  tdf %>%
+      filter(ACC==1) %>%
+      save1D('onset', corname, dur='dur', nblocks=nblocks)
+  tdf %>%
+      filter(ACC==0) %>%
+      save1D('onset', errname, dur='dur', nblocks=nblocks)
+}
 
 # write 1d files
-timing %>%
-    split(paste(.$id, .$year, .$event)) %>%
-    lapply(function(tdf) {
-       outname <- with(tdf,glue("1d/sub-{first(id)}_ses-{first(year)}/{first(event)}.1d"))
-
-       outdir <- dirname(outname)
-       if(!dir.exists(outdir)) dir.create(outdir, recursive=T)
-
+by_event <- timing %>% split(paste(.$id, .$year, .$event))
+by_event %>% lapply(function(tdf) {
+       outname <- with(tdf[1,],glue("1d/sub-{id}_ses-{year}/{event}.1d"))
+       mkdir_for(outname)
        nblocks <- max(tdf$block)
        saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
-       if(first(tdf$event)=='Mem') return(saved_as)
-       corname <- gsub('.1d$','_crct.1d', outname)
-       errname <- gsub('.1d$','_err.1d', outname)
-       tdf %>%
-           filter(ACC==1) %>%
-           save1D('onset', corname, dur='dur', nblocks=nblocks)
-       tdf %>%
-           filter(ACC==0) %>%
-           save1D('onset', errname, dur='dur', nblocks=nblocks)
-       })
+       write_by_acc(tdf, outname)
+})
+
+
+by_task_event <- timing %>% split(paste(.$id, .$year, .$task, .$event))
+by_task_event %>% lapply(function(tdf) {
+       outname <- with(tdf[1,],glue("1d/sub-{id}_ses-{year}/{task}/{event}.1d"))
+       mkdir_for(outname)
+       nblocks <- 3
+       saved_as <- save1D(tdf, 'onset', outname, dur='dur', nblocks=nblocks)
+       write_by_acc(tdf, outname)
+})
