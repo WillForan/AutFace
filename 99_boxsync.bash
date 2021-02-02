@@ -29,7 +29,7 @@ rclone copy ../glm box:Collab/KOH_Aut/glm \
 
 ! [[ "$copy" =~ preproc ]] && exit 0
 cat > txt/tx_filter.txt <<EOF 
-+ */[12]*/ses-*/sub-*_task-*_bold/{motion_info/*,*reg*.txt,.reg*_in_use,nfaswdktm_func_6.nii.gz,motion.par,preprocessFunctional.log,tm_func.nii.gz}
++ */[12]*/ses-*/sub-*_task-*_bold/{motion_info/*,*reg*.txt,.reg*_in_use,bgrnaswdktm_func_6.nii.gz,nfaswdktm_func_6.nii.gz,motion.par,preprocessFunctional.log,tm_func.nii.gz}
 - *
 EOF
 # + MHT1_2mm/[12]*/ses-*/{mprage.nii.gz,mprage_bet.nii.gz,mprage_warpcoef.nii.gz,mprage_nonlinear_warp_MNI_2mm.nii.gz,mprage_warp_linear.nii.gz,preprocessMprage.log}

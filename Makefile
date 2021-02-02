@@ -56,3 +56,17 @@ masks/memtask_coverageGT200.nii.gz:
 ../stats/face-mem_ttest.nii.gz: txt/dt/glm_faceVcar.txt masks/memtask_coverageGT200.nii.gz
 	./05_ttest-faceVsMem.bash
 
+txt/fd_summary.csv:
+	./motion_info.R
+
+txt/id_demog.csv: txt/mrid_id.txt txt/fd_summary.csv txt/AutSubDemos_20180501.csv
+	./id_dmg.R
+
+txt/mvm-faceCar.tsv: txt/id_demog.csv
+	./06_mvm-table.R
+
+../group/mvm-faceCar.nii.gz: txt/mvm-faceCar.tsv
+	./06_mvm-faceCar.bash
+
+txt/id_stat_ultrawide.csv: txt/id_dmg.csv
+	./merge_box.R
