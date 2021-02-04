@@ -10,9 +10,10 @@ env|grep -q ^DRYRUN=. && DRYRUN=echo || DRYRUN=
 #
 # 20210124WF - init
 getset(){
-   perl -slane 'print $F[1] if m/$pat/' -- -pat="$1" < txt/dt/glm_faceVcar.txt
+   perl -slane 'print "$F[0] $F[1]","[corr-mem_GLT#0_Coef]" if m/$pat/' -- -pat="$1" < txt/dt/glm_faceVcar.txt
 }
 
+# TODO: age and iq covariets
 $DRYRUN 3dttest++ \
    -prefix ../stats/face-mem_ttest.nii.gz \
    -Clustsim 4 \
