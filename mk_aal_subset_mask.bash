@@ -16,7 +16,7 @@ set -x
 WANT='fusiform|temporal_sup|temporal_inf|amy|frontal_inf'
 label_file="masks/AAL3/orig/AAL3v1_1mm.nii.txt"
 roi_file="masks/AAL3/orig/AAL3v1_1mm.nii.gz"
-output="masks/AAL3/AAL_subset.nii.gz"
+output="masks/AAL3/AAL_subset7.nii.gz"
 out_txt=${output/.gz/.txt}
 # how to combine them
 subset_as_3calc(){
@@ -45,3 +45,6 @@ grep -Pi "$WANT" $label_file |
 exp=$(cat $out_txt | subset_as_3calc )
 3dcalc -prefix $output -a $roi_file -expr "$exp" -overwrite
 3dNotes -h "$0" $output
+
+example="../preproc/rest/102/ses-1/sub-102_ses-1_task-rest_bold/bgrnaswdktm_mean_func_6.nii.gz"
+3dresample -prefix ${output/.nii.gz/_rsfunc.nii.gz} -inset $output  -master $example -rmode NN

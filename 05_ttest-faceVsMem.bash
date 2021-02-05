@@ -9,13 +9,14 @@ env|grep -q ^DRYRUN=. && DRYRUN=echo || DRYRUN=
 # (also annotate in Makefile)
 #
 # 20210124WF - init
+# TODO: label should include session
 getset(){
    perl -slane 'print "$F[0] $F[1]","[corr-mem_GLT#0_Coef]" if m/$pat/' -- -pat="$1" < txt/dt/glm_faceVcar.txt
 }
 
 # TODO: age and iq covariets
 $DRYRUN 3dttest++ \
-   -prefix ../stats/face-mem_ttest.nii.gz \
+   -prefix ../group/face-mem_ttest/face-mem_ttest.nii.gz \
    -Clustsim 4 \
    -mask masks/memtask_coverageGT200.nii.gz \
    -setA ASD $(getset 'ASD$') \
