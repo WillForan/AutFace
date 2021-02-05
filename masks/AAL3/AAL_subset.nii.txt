@@ -1,0 +1,14 @@
+45 Amygdala
+46 Amygdala
+7 Frontal_Inf_Oper
+8 Frontal_Inf_Oper
+11 Frontal_Inf_Orb_2
+12 Frontal_Inf_Orb_2
+10 Frontal_Inf_Tri
+9 Frontal_Inf_Tri
+59 Fusiform
+60 Fusiform
+93 Temporal_Inf
+94 Temporal_Inf
+85 Temporal_Sup
+86 Temporal_Sup
