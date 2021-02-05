@@ -12,6 +12,5 @@ for f in ../preproc/rest/*/ses-*/sub-*_task-rest_bold/bgrnaswdktm_func_6.nii.gz;
    test -r ${prefix}.zval.1D && echo "# have $_, skipping" && continue
    test ! -d  $(dirname $prefix) && mkdir -p $_
    @ROI_Corr_Mat -ts $f -roi $mask -zval -prefix $prefix -verb
-   break
 done
 

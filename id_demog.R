@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+library(dplyr)
 # 20210202 WF -- copy out of merge_box.R for generic saving
 
 # only have six sig figs for bircid in 2018 demog csv
