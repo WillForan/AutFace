@@ -68,7 +68,7 @@ txt/mvm-faceCar.tsv: txt/id_demog.csv
 ../group/mvm-faceCar.nii.gz: txt/mvm-faceCar.tsv
 	./06_mvm-faceCar.bash
 
-txt/mvm-phase.tsv: txt/id_demog.csv
+txt/mvm-phase.tsv txt/mvm-phase_ses-1.tsv: txt/id_demog.csv
 	./06.2_mvm_table-phase.R
 
 ../group/mvm-phase.nii.gz: txt/mvm-phase.tsv

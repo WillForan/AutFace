@@ -12,7 +12,7 @@ test ! -d ../group && mkdir $_
 #    'Group : 1*Old Age : ', or
 #    'Group : 1*Old - 1*Young Age : '.
 # 4) The absence of a categorical =>  levels are averaged (or collapsed)
-njobs=$[$(nproc --all)/4]
+njobs=$[$(nproc --all)/2]
 
           age='age :'
   cohort_diff='cohort : -1*CONTROL +1*AUTISM'
@@ -58,4 +58,4 @@ corr_face_car='phase : -2*Ccorr +1*Acorr +1*Ucorr'
  -gltLabel 24 AgeCohortUSA_c-m  -gltCode 24 "$cohort_diff $U_mem_corr $age" \
  -gltLabel 25 AgeCohortCAR_c-m  -gltCode 25 "$cohort_diff $C_mem_corr $age" \
  -gltLabel 26 AgeCohortFACE_c-m -gltCode 26 "$cohort_diff $F_mem_corr $age" \
- -dataTable @txt/mvm-phase.tsv
+ -dataTable @txt/mvm-phase_ses-1.tsv
